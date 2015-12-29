@@ -164,7 +164,7 @@ class BackgroundProcess
 
     /**
      * @param string $message Exception message if the OS is not supported
-     *
+     * 
      * @throws RuntimeException if the operating system is not supported by Cocur\BackgroundProcess
      *
      * @codeCoverageIgnore
