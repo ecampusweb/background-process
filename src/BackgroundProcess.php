@@ -98,6 +98,19 @@ class BackgroundProcess
 
         return false;
     }
+    
+    /**
+     * Returns if a process with the provided $pid is currently running.
+     *
+     * @return boolean TRUE if the process is running, FALSE if not.
+     */
+    public static function isProcessRunning($pid)
+    {
+        $process = new static;
+        $process->pid = $pid;
+        
+        return $process->isRunning();
+    }
 
     /**
      * Stops the process.
