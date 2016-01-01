@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Process;
+namespace Cocur\BackgroundProcess;
 
 /**
  * Generic executable finder.
