@@ -24,8 +24,8 @@ use RuntimeException;
 class BackgroundProcess
 {
     const OS_WINDOWS = 1;
-    const OS_NIX     = 2;
-    const OS_OTHER   = 3;
+    const OS_NIX = 2;
+    const OS_OTHER = 3;
 
     /**
      * @var string
@@ -47,9 +47,9 @@ class BackgroundProcess
      *
      * @codeCoverageIgnore
      */
-    public function __construct($command)
+    public function __construct($command = '')
     {
-        $this->command  = $command;
+        $this->command = $command;
         $this->serverOS = $this->getOS();
     }
 
@@ -70,7 +70,7 @@ class BackgroundProcess
                 break;
             default:
                 throw new RuntimeException(sprintf(
-                    'Could not execute command "%s" because operating system "%s" is not supported by '.
+                    'Could not execute command "%s" because operating system "%s" is not supported by ' .
                     'Cocur\BackgroundProcess.',
                     $this->command,
                     PHP_OS
@@ -83,13 +83,17 @@ class BackgroundProcess
      *
      * @return bool TRUE if the process is running, FALSE if not.
      */
-    public function isRunning()
+    public function isRunning($pid = '')
     {
-        $this->checkSupportingOS('Cocur\BackgroundProcess can only check if a process is running on *nix-based '.
-                                 'systems, such as Unix, Linux or Mac OS X. You are running "%s".');
+        if (!$pid) {
+            $pid = $this->pid;
+        }
+
+        $this->checkSupportingOS('Cocur\BackgroundProcess can only check if a process is running on *nix-based ' .
+            'systems, such as Unix, Linux or Mac OS X. You are running "%s".');
 
         try {
-            $result = shell_exec(sprintf('ps %d 2>&1', $this->pid));
+            $result = shell_exec(sprintf('ps %d 2>&1', $pid));
             if (count(preg_split("/\n/", $result)) > 2 && !preg_match('/ERROR: Process ID out of range/', $result)) {
                 return true;
             }
@@ -97,19 +101,6 @@ class BackgroundProcess
         }
 
         return false;
-    }
-    
-    /**
-     * Returns if a process with the provided $pid is currently running.
-     *
-     * @return boolean TRUE if the process is running, FALSE if not.
-     */
-    public static function isProcessRunning($pid)
-    {
-        $process = new static;
-        $process->pid = $pid;
-        
-        return $process->isRunning();
     }
 
     /**
@@ -119,8 +110,8 @@ class BackgroundProcess
      */
     public function stop()
     {
-        $this->checkSupportingOS('Cocur\BackgroundProcess can only stop a process on *nix-based systems, such as '.
-                                 'Unix, Linux or Mac OS X. You are running "%s".');
+        $this->checkSupportingOS('Cocur\BackgroundProcess can only stop a process on *nix-based systems, such as ' .
+            'Unix, Linux or Mac OS X. You are running "%s".');
 
         try {
             $result = shell_exec(sprintf('kill %d 2>&1', $this->pid));
@@ -140,8 +131,8 @@ class BackgroundProcess
      */
     public function getPid()
     {
-        $this->checkSupportingOS('Cocur\BackgroundProcess can only return the PID of a process on *nix-based systems, '.
-                                 'such as Unix, Linux or Mac OS X. You are running "%s".');
+        $this->checkSupportingOS('Cocur\BackgroundProcess can only return the PID of a process on *nix-based systems, ' .
+            'such as Unix, Linux or Mac OS X. You are running "%s".');
 
         return $this->pid;
     }
@@ -155,8 +146,10 @@ class BackgroundProcess
 
         if (substr($os, 0, 3) === 'WIN') {
             return self::OS_WINDOWS;
-        } else if ($os === 'LINUX' || $os === 'FREEBSD' || $os === 'DARWIN') {
-            return self::OS_NIX;
+        } else {
+            if ($os === 'LINUX' || $os === 'FREEBSD' || $os === 'DARWIN') {
+                return self::OS_NIX;
+            }
         }
 
         return self::OS_OTHER;
@@ -164,7 +157,7 @@ class BackgroundProcess
 
     /**
      * @param string $message Exception message if the OS is not supported
-     * 
+     *
      * @throws RuntimeException if the operating system is not supported by Cocur\BackgroundProcess
      *
      * @codeCoverageIgnore
